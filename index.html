@@ -1,121 +1,243 @@
 <!DOCTYPE html>
 <html lang="ja">
-
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>nazozokc</title>
-  <meta name="description" content="nazozokcの個人ホームページ。中学生プログラマ / Linux / Neovim / TypeScript" />
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>nazozokc :: kanagawa-dragon</title>
 
-  <style>
-    :root {
-      --bg: #0f0f0f;
-      --fg: #e5e5e5;
-      --sub: #a1a1aa;
-      --accent: #38bdf8;
-    }
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 
-    * {
-      box-sizing: border-box;
-    }
+<style>
+:root {
+  --bg: #181616;
+  --fg: #c5c9c5;
+  --green: #8a9a7b;
+  --blue: #8ba4b0;
+  --red: #c4746e;
+  --yellow: #c4b28a;
+  --gray: #625e5a;
+  --bar: #1f1c19;
+}
 
-    body {
-      margin: 0;
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
-      background: var(--bg);
-      color: var(--fg);
-      line-height: 1.7;
-    }
+body {
+  background: var(--bg);
+  color: var(--fg);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+               "Liberation Mono", "Courier New", monospace;
+  margin: 0;
+}
 
-    a {
-      color: var(--accent);
-      text-decoration: none;
-    }
+.prompt-user { color: var(--green); }
+.prompt-path { color: var(--blue); }
+.accent { color: var(--yellow); }
+.muted { color: var(--gray); }
+.cmd { cursor: pointer; color: var(--blue); }
+.cmd:hover { text-decoration: underline; }
 
-    a:hover {
-      text-decoration: underline;
-    }
+.md h1 { color: var(--yellow); font-size: 1.25em; margin-top: 1em; }
+.md h2 { color: var(--blue); margin-top: 1em; }
+.md ul { margin-left: 1.2em; list-style: disc; }
+.md p  { margin-top: .5em; }
+.back-top { cursor: pointer; color: var(--yellow); margin-top: 0.5em; display: inline-block; }
+.back-top:hover { text-decoration: underline; }
 
-    .container {
-      max-width: 900px;
-      margin: 0 auto;
-      padding: 48px 24px;
-    }
-
-    header h1 {
-      font-size: 2.5rem;
-      margin: 0;
-    }
-
-    header p {
-      color: var(--sub);
-      margin-top: 8px;
-    }
-
-    section {
-      margin-top: 64px;
-    }
-
-    h2 {
-      font-size: 1.6rem;
-      margin-bottom: 16px;
-    }
-
-    ul {
-      padding-left: 18px;
-    }
-
-    li {
-      margin-bottom: 6px;
-    }
-
-    footer {
-      margin-top: 96px;
-      text-align: center;
-      color: var(--sub);
-      font-size: 0.9rem;
-    }
-  </style>
+#cmdInput {
+  background: transparent;
+  border: none;
+  outline: none;
+  color: var(--fg);
+  font-family: inherit;
+  font-size: 1em;
+  width: 60%;
+}
+</style>
 </head>
+<body class="min-h-screen">
 
-<body>
-  <div class="container">
-    <header>
-      <h1>nazozokc</h1>
-      <p>Student / Programmer / OSS好き</p>
-    </header>
-
-    <section>
-      <h2>About</h2>
-      <p>
-        中学生プログラマ。Arch Linux と Neovim を愛用。
-        TypeScript / JavaScript を中心に API・CLI・開発環境構築をやってる。
-        「動くものをちゃんと作る」がモットー。
-      </p>
-    </section>
-
-    <section>
-      <h2>Skills</h2>
-      <ul>
-        <li>HTML / CSS / JavaScript</li>
-        <li>TypeScript / Node.js</li>
-        <li>React（必要なときだけ）</li>
-        <li>Linux（Arch）</li>
-        <li>Neovim</li>
-      </ul>
-    </section>
-
-    <section>
-      <h2>Links</h2>
-      <ul>
-        <li><a href="https://github.com/nazozokc" target="_blank">GitHub</a></li>
-      </ul>
-    </section>
-
-    <footer>
-      © 2026 nazozokc
-    </footer>
+<!-- Top bar -->
+<div class="w-full border-b border-zinc-800" style="background:var(--bar)">
+  <div class="max-w-4xl mx-auto px-4 py-2 flex items-center justify-between text-sm">
+    <div class="muted">nazozokc@arch — terminal</div>
+    <div class="flex gap-4">
+      <a href="https://x.com/@NazozoK6519" target="_blank" class="text-blue-300 hover:underline">X</a>
+      <a href="https://github.com/nazozokc" target="_blank" class="text-blue-300 hover:underline">GitHub</a>
+    </div>
   </div>
-</body>
+</div>
 
+<div class="px-4 py-6">
+  <div id="terminal" class="max-w-4xl mx-auto text-sm sm:text-base leading-relaxed space-y-4"></div>
+
+  <!-- コマンド入力 -->
+  <div class="max-w-4xl mx-auto mt-4 flex items-center">
+    <span class="prompt-user">nazozokc@arch</span>:<span class="prompt-path">~</span>$ 
+    <input id="cmdInput" type="text" autocomplete="off" autofocus>
+  </div>
+
+  <!-- クリック式コマンド補助 -->
+  <div class="max-w-4xl mx-auto mt-6 text-sm sm:text-base">
+<pre>
+[クリックで実行]
+[1] <span class="cmd" onclick="executeCommand('neovim')">neovim</span>
+[2] <span class="cmd" onclick="executeCommand('blog')">blog</span>
+[3] <span class="cmd" onclick="executeCommand(':q')">:q (トップに戻る)</span>
+[4] <span class="cmd" onclick="executeCommand('clear')">clear</span>
+</pre>
+  </div>
+</div>
+
+<script>
+const terminal = document.getElementById("terminal");
+const cmdInput = document.getElementById("cmdInput");
+
+// タイピングアニメーション
+function typeLine(line, delay = 20) {
+  return new Promise(resolve => {
+    let i = 0;
+    const pre = document.createElement('pre');
+    terminal.appendChild(pre);
+    const interval = setInterval(() => {
+      pre.textContent += line[i];
+      i++;
+      window.scrollTo(0, document.body.scrollHeight);
+      if (i >= line.length) {
+        clearInterval(interval);
+        resolve();
+      }
+    }, delay);
+  });
+}
+
+async function appendLines(lines, delay = 20) {
+  for (const line of lines) {
+    await typeLine(line, delay);
+  }
+}
+
+// コマンド入力の Enter
+cmdInput.addEventListener("keydown", async (e) => {
+  if(e.key === "Enter") {
+    const cmd = cmdInput.value.trim();
+    if(!cmd) return;
+    cmdInput.value = "";
+    await executeCommand(cmd);
+  }
+});
+
+// コマンド実行
+async function executeCommand(cmd) {
+  await appendLines([`nazozokc@arch:~$ ${cmd}`]);
+
+  if(cmd === "neovim") {
+    await appendLines([
+      "Neovim Environment",
+      "-----------------",
+      "editor : Neovim",
+      "theme  : kanagawa-dragon",
+      "policy : 軽さ / 自作 / 可読性",
+      ""
+    ]);
+  }
+
+  if(cmd === "blog") {
+    await appendLines(["loading latest blog..."]);
+    fetch("./blog/index.md")
+      .then(r => r.text())
+      .then(md => displayMarkdown(md, true))
+      .catch(() => appendLines(["error: failed to load blog"]));
+  }
+
+  if(cmd === ":q") {
+    terminal.innerHTML = "";
+    await initTerminal();
+  }
+
+  if(cmd === "clear") {
+    terminal.innerHTML = "";
+  }
+}
+
+// Markdown表示関数
+function displayMarkdown(md, single=false) {
+  const div = document.createElement("div");
+  div.className = "md";
+  div.innerHTML = marked.parse(md);
+  terminal.appendChild(div);
+  window.scrollTo(0, document.body.scrollHeight);
+
+  if(single){
+    displayTopOnlyMenu();
+  }
+}
+
+// 単体記事用 top メニュー
+function displayTopOnlyMenu() {
+  const menu = document.createElement("div");
+  menu.className = "mt-2";
+  const top = document.createElement("span");
+  top.textContent = "[top]";
+  top.className = "back-top";
+  top.onclick = () => {
+    menu.remove();
+    terminal.innerHTML = "";
+    initTerminal();
+  };
+  menu.appendChild(top);
+  terminal.appendChild(menu);
+  window.scrollTo(0, document.body.scrollHeight);
+}
+
+// 初期表示
+async function initTerminal() {
+  terminal.innerHTML = "";
+
+  await appendLines([
+    "nazozokc@arch:~$ whoami",
+    "nazozokc",
+    "nazozokc@arch:~$ cat about.txt",
+    "中学生プログラマ",
+    "Arch Linux / Neovim / TypeScript",
+    "API開発・CLIツール・環境構築が好き",
+    "nazozokc@arch:~$ ls skills/",
+    "TypeScript  JavaScript  Node.js",
+    "React       Linux       Neovim",
+    "nazozokc@arch:~$ ls projects/",
+    "loading repositories..."
+  ]);
+
+  // GitHub repos
+  fetch("https://api.github.com/users/nazozokc/repos?sort=updated")
+    .then(res => res.json())
+    .then(async repos => {
+      for(const repo of repos.filter(r => !r.fork).slice(0,6)){
+        await appendLines([`${repo.name} - ${repo.description ?? "no description"} → ${repo.html_url}`]);
+      }
+      // select command 表示
+      await appendLines([
+        "nazozokc@arch:~$ select command",
+        "[1] neovim",
+        "[2] blog",
+        "[3] :q (トップに戻る)",
+        "[4] clear"
+      ]);
+    })
+    .catch(async () => {
+      await appendLines(["error: failed to load repositories"]);
+      await appendLines([
+        "nazozokc@arch:~$ select command",
+        "[1] neovim",
+        "[2] blog",
+        "[3] :q (トップに戻る)",
+        "[4] clear"
+      ]);
+    });
+}
+
+// 初期化
+initTerminal();
+</script>
+
+</body>
 </html>
+
