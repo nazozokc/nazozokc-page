@@ -473,6 +473,9 @@ body::before {
   -webkit-backdrop-filter: blur(10px);
   backdrop-filter: blur(10px);
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  text-decoration: none;
+  display: block;
+  color: inherit;
 }
 
 .repo-item:hover {
@@ -496,18 +499,11 @@ body::before {
 .repo-url {
   color: var(--blue);
   font-size: 0.85rem;
-  text-decoration: none;
   display: inline-block;
   margin-top: 0.35rem;
   padding: 0.25rem 0.5rem;
   border-radius: 4px;
   transition: all 0.2s ease;
-}
-
-.repo-url:hover {
-  text-decoration: none;
-  background: rgba(139, 164, 176, 0.15);
-  text-shadow: 0 0 8px var(--glow-blue);
 }
 
 /* Responsive */
@@ -527,13 +523,6 @@ body::before {
   #cmdInput {
     width: 100%;
   }
-}
-
-/* External link indicator */
-.repo-url::after {
-  content: ' ↗';
-  font-size: 0.75em;
-  opacity: 0.6;
 }
 
 /* Prompt glow */
@@ -995,12 +984,15 @@ async function initTerminal() {
     const filteredRepos = repos.filter(r => !r.fork).slice(0, 6);
 
     for (const repo of filteredRepos) {
-      const repoDiv = document.createElement('div');
+      const repoDiv = document.createElement('a');
       repoDiv.className = 'repo-item';
+      repoDiv.href = repo.html_url;
+      repoDiv.target = '_blank';
+      repoDiv.rel = 'noopener noreferrer';
       repoDiv.innerHTML = `
         <div class="repo-name">${escapeHtml(repo.name)}</div>
         <div class="repo-desc">${escapeHtml(repo.description || "no description")}</div>
-        <a href="${repo.html_url}" target="_blank" class="repo-url">${repo.html_url}</a>
+        <span class="repo-url">${repo.html_url}</span>
       `;
       terminal.appendChild(repoDiv);
       await sleep(100);
