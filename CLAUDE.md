@@ -3,206 +3,206 @@ name: nazozokc-portfolio
 description: Help debug, improve, and maintain the nazozokc terminal-style HTML portfolio. Use this skill whenever the user wants to modify the portfolio design, add/remove features, fix bugs, optimize performance, improve GitHub API integration, or enhance the terminal UI/UX. This includes styling changes, JavaScript logic updates, new command implementations, and responsive design tweaks.
 ---
 
-# nazozokc Portfolio Assistant
+# nazozokc ポートフォリオアシスタント
 
-This skill helps with managing and improving the nazozokc terminal-style HTML portfolio website.
+このスキルは、nazozokcのターミナル風HTMLポートフォリオウェブサイトの管理と改善を支援します。
 
-## Project Overview
+## プロジェクト概要
 
-The portfolio is a single-page HTML application that simulates a Linux terminal interface. It displays a developer's profile, skills, and GitHub repositories in an interactive terminal aesthetic.
+このポートフォリオは、Linuxターミナルインターフェースをシミュレートする単一ページのHTMLアプリケーションです。開発者のプロフィール、スキル、GitHubリポジトリをインタラクティブなターミナルデザインで表示します。
 
-**Key Features:**
-- Terminal UI with blurred glassmorphism design
-- Real-time GitHub API integration (user profile, repositories, commit stats)
-- Interactive click-to-execute commands
-- TypeScript/JavaScript focus display
-- Responsive design with smooth animations
-- Custom color scheme (kanagawa-inspired)
+**主な機能:**
+- ぼかし付きグラスモーフィズムデザインのターミナルUI
+- リアルタイムGitHub API連携（ユーザープロファイル、リポジトリ、コミット統計）
+- クリックで実行可能なコマンド
+- TypeScript/JavaScriptフォーカス表示
+- スムーズなアニメーション対応レスポンシブデザイン
+- カスタムカラースキーム（Kanagawaインスピレーション）
 
-**Tech Stack:**
-- HTML5, CSS3 (custom properties, animations, backdrop-filter)
-- Vanilla JavaScript (async/await, fetch API)
-- GitHub REST API for live data
-- Marked.js library (currently loaded but not used)
+**技術スタック:**
+- HTML5、CSS3（カスタムプロパティ、アニメーション、backdrop-filter）
+-  Vanilla JavaScript（async/await、fetch API）
+- ライブデータ用GitHub REST API
+- Marked.jsライブラリ（現在読み込み済みだが未使用）
 
 ---
 
-## Architecture
+## アーキテクチャ
 
-### DOM Structure
+### DOM構造
 ```
 <body>
-├── <header class="top-bar">          // Sticky navigation
-│   ├── Status indicator + title
-│   └── Links (X, GitHub)
+├── <header class="top-bar">          // スティッキーナビゲーション
+│   ├── ステータスインジケーター + タイトル
+│   └── リンク (X, GitHub)
 ├── <main class="terminal-container">
-│   ├── #terminal (output area)
-│   ├── .input-line (command input)
-│   └── .click-commands (button grid)
+│   ├── #terminal (出力エリア)
+│   ├── .input-line (コマンド入力)
+│   └── .click-commands (ボタングリッド)
 ```
 
-### Color Scheme (CSS Variables)
+### カラースキーム（CSS変数）
 ```
---bg: #0d0c0c              // Background
---bg-secondary: #181818    // Secondary bg
---fg: #c5c9c5              // Foreground text
---green: #8a9a7b           // Accent (primary)
---blue: #8ba4b0            // Accent (secondary)
---red: #c4746e             // Error
---yellow: #c4b28a          // Highlight
---purple: #a292a3          // Unused
---gray: #6c6a6c            // Muted text
+--bg: #0d0c0c              // 背景
+--bg-secondary: #181818    // セカンダリ背景
+--fg: #c5c9c5              // 前景テキスト
+--green: #8a9a7b           // アクセント（プライマリ）
+--blue: #8ba4b0            // アクセント（セカンダリ）
+--red: #c4746e             // エラー
+--yellow: #c4b28a          // ハイライト
+--purple: #a292a3          // 未使用
+--gray: #6c6a6c            // ミュートテキスト
 ```
 
 ---
 
-## Command Handlers
+## コマンドハンドラー
 
 ### 1. `neovim`
-Displays Neovim configuration details in a table format.
-- Manager: lazy.nvim
-- Theme: kanagawa-dragon
-- LSPs: lua_ls, ts_ls, html, nixd
-- Associated tools: lualine, noice, nvim-notify, gitsigns, lazygit, octo, nvim-dap, neotest
+テーブル形式でNeovim設定詳細を表示。
+- マネージャー: lazy.nvim
+- テーマ: kanagawa-dragon
+- LSP: lua_ls, ts_ls, html, nixd
+- 関連ツール: lualine, noice, nvim-notify, gitsigns, lazygit, octo, nvim-dap, neotest
 
-**File:** Inline in script section
-**Type:** Static display
+**ファイル:** スクリプトセクション内にインライン
+**タイプ:** 静的表示
 
 ### 2. `nix`
-Shows Nix/Home Manager setup information.
-- System: Linux/macOS (cross-platform)
-- Shell: fish
-- Development tools: nodejs, bun, deno, rustc
-- CLI tools: jq, bat, fzf, zoxide, yazi
+Nix/Home Managerセットアップ情報を表示。
+- システム: Linux/macOS（クロスプラットフォーム）
+- シェル: fish
+- 開発ツール: nodejs, bun, deno, rustc
+- CLIツール: jq, bat, fzf, zoxide, yazi
 
-**File:** Inline in script section
-**Type:** Static display
+**ファイル:** スクリプトセクション内にインライン
+**タイプ:** 静的表示
 
 ### 3. `wezterm`
-Displays WezTerm terminal configuration.
-- Config: Lua-based (modular)
-- Theme: kanagawa (custom palette)
-- Keyboard shortcuts for splits, focus, tabs, fullscreen
-- IME support (Japanese input)
+WezTermターミナル設定を表示。
+- 設定: Luaベース（モジュラー）
+- テーマ: kanagawa（カスタムパレット）
+- キーボードショートカット（スプリットフォーカス、タブ、フルスクリーン）
+- IMEサポート（日本語入力）
 
-**File:** Inline in script section
-**Type:** Static display
+**ファイル:** スクリプトセクション内にインライン
+**タイプ:** 静的表示
 
 ### 4. `X`
-Direct link to X/Twitter profile: `https://x.com/@NazozoK6519`
+X/Twitterプロフィールへの直接リンク: `https://x.com/@NazozoK6519`
 
-**File:** Inline in script section
-**Type:** Link
+**ファイル:** スクリプトセクション内にインライン
+**タイプ:** リンク
 
 ### 5. `github`
-**Most Complex Command** - Fetches live data from GitHub API:
-1. User profile info (name, bio, public repos, followers, following)
-2. All public repositories
-3. Commit count for each repo (using Link header pagination)
-4. Top 3 repositories by commit count
-5. Links to full GitHub profile
+**最も複雑なコマンド** - GitHub APIからライブデータを取得:
+1. ユーザープロファイル情報（名前、Bio、公開リポジトリ数、フォロワー、フォロー中）
+2. すべての公開リポジトリ
+3. 各リポジトリのコミット数（Linkヘッダページネーションを使用）
+4. コミット数によるトップ3リポジトリ
+5. 完全なGitHubプロフィールへのリンク
 
-**API Calls:**
-- `GET /users/nazozokc` → User profile
-- `GET /users/nazozokc/repos?per_page=100` → Repository list
-- `GET /repos/nazozokc/{repo}/commits?per_page=1` → Commit pagination
+**API呼び出し:**
+- `GET /users/nazozokc` → ユーザープロファイル
+- `GET /users/nazozokc/repos?per_page=100` → リポジトリ一覧
+- `GET /repos/nazozokc/{repo}/commits?per_page=1` → コミットページネーション
 
-**Limitations:**
-- GitHub API rate limit: 60 requests/hour (unauthenticated)
-- No auth token included (public data only)
-- Slow on first load (multiple sequential API calls)
+**制限事項:**
+- GitHub APIレート制限: 60リクエスト/時（認証なし）
+- 認証トークンなし（パブリックデータのみ）
+- 初回読み込みが遅い（複数のシーケンシャルAPI呼び出し）
 
-**Potential Improvements:**
-- Cache results in localStorage
-- Use authenticated requests (higher rate limits)
-- Parallelize API calls with Promise.all()
-- Add error handling for rate limiting
+**潜在的な改善点:**
+- localStorageに結果をキャッシュ
+- 認証リクエストを使用（更高的レート制限）
+- Promise.all()でAPI呼び出しを並列化
+- レート制限のエラー処理を追加
 
 ### 6. `:q`
-Clears the terminal and reinitializes it (vim-style quit + reload).
+ターミナルをクリアして再初期化（vimスタイルの終了+リロード）。
 
-**File:** `handleQuit()` function
-**Behavior:** Clears output, calls `initTerminal()`, resets to initial state
+**ファイル:** `handleQuit()` 関数
+**動作:** 出力をクリアし、`initTerminal()`を呼び出して初期状態にリセット
 
 ### 7. `clear`
-Simple terminal clear command.
+シンプルなターミナルクリアコマンド。
 
-**File:** `handleClear()` function
-**Behavior:** Sets `terminal.innerHTML = ""`
-
----
-
-## JavaScript Functions
-
-### Initialization
-- **`initTerminal()`** - Runs on page load and after `:q` command
-  - Displays whoami → nazozokc
-  - Displays about.txt (3 lines)
-  - Displays ls skills/ (skill tags)
-  - Fetches and displays top 6 repositories
-  - Adds "select command from below" message
-
-### Output Rendering
-- **`createOutputLine(content, className)`** - Creates and appends div with animation
-- **`typeText(text, element, speed)`** - Simulates typing effect (char-by-char)
-- **`appendLines(lines, delay)`** - Types multiple lines with delays between them
-- **`scrollToBottom()`** - Smooth scroll (with fallback for older browsers)
-
-### Command Execution
-- **`executeCommand(cmd)`** - Main router; displays prompt + delegates to handler
-- **`handleNeovim()`, `handleNix()`, `handleWezterm()`, `handleGithub()`** - Individual command handlers
-
-### Utilities
-- **`escapeHtml(text)`** - Prevents XSS from dynamic content (GitHub data)
-- **`sleep(ms)`** - Promise-based delay
-- **`displayBackTop()`** - Creates "back to top" button (defined but unused)
+**ファイル:** `handleClear()` 関数
+**動作:** `terminal.innerHTML = ""` を設定
 
 ---
 
-## Known Issues & Improvement Opportunities
+## JavaScript関数
 
-### Performance
-1. **GitHub API calls are sequential** - Top 6 repos load fine, but commit counting is slow
-   - Fix: Parallelize with Promise.all()
-   
-2. **No caching** - Every page reload fetches fresh data
-   - Fix: Store in localStorage with TTL
+### 初期化
+- **`initTerminal()`** - ページ読み込み時および `:q` コマンド後に実行
+  - whoami → nazozokc を表示
+  - about.txt（3行）を表示
+  - ls skills/（スキルタグ）を表示
+  - トップ6リポジトリを取得して表示
+  - 「以下のコマンドから選択」メッセージを追加
 
-3. **Marked.js is loaded but never used**
-   - Fix: Remove from CDN link if not needed
+### 出力レンダリング
+- **`createOutputLine(content, className)`** - アニメーション付きでdivを作成して追加
+- **`typeText(text, element, speed)`** - タイピング効果をシミュレート（1文字ずつ）
+- **`appendLines(lines, delay)`** - 遅延を入れながら複数行をタイプ
+- **`scrollToBottom()`** - スムーズスクロール（古いブラウザ用のフォールバック付き）
 
-4. **typeText() is slow for long content**
-   - Option: Reduce typing speed or batch render
+### コマンド実行
+- **`executeCommand(cmd)`** - メインルーター; プロンプトを表示してハンドラーに委譲
+- **`handleNeovim()`, `handleNix()`, `handleWezterm()`, `handleGithub()`** - 個別のコマンドハンドラー
 
-### Reliability
-1. **No GitHub auth token** - Vulnerable to rate limiting
-   - Fix: Add personal access token (but keep it secret)
+### ユーティリティ
+- **`escapeHtml(text)`** - 動的コンテンツ（GitHubデータ）からのXSS防止
+- **`sleep(ms)`** - Promiseベースの遅延
+- **`displayBackTop()`** - 「トップに戻る」ボタンを作成（定義されているが未使用）
 
-2. **Error handling is minimal** - Generic "error: failed to load github info" message
-   - Fix: Show specific error (rate limited vs network error)
+---
 
-3. **Responsive design** - Mobile might show horizontal scroll
-   - Test on smaller screens; media query exists but may need tweaks
+## 既知の問題と改善の機会
+
+### パフォーマンス
+1. **GitHub API呼び出しがシーケンシャル** - トップ6リポジトリは正常に読み込めるが、コミットカウントが遅い
+   - 修正: Promise.all()で並列化
+
+2. **キャッシュなし** - 每次ページリロードで新鮮なデータを取得
+   - 修正: TTL付きでlocalStorageに存储
+
+3. **Marked.jsは読み込まれているが未使用**
+   - 修正: 不要であればCDNリンクから削除
+
+4. **typeText()が長いコンテンツで遅い**
+   - オプション: タイピング速度を落とすかバッチレンダリング
+
+### 信頼性
+1. **GitHub認証トークンなし** - レート制限の影響を受けやすい
+   - 修正: パーソナルアクセストークンを追加（ただし秘密に保つ）
+
+2. **エラー処理が最小限** - 一般的な「エラー: github情報の読み込みに失敗しました」メッセージ
+   - 修正: 具体的なエラーを表示（レート制限 vs ネットワークエラー）
+
+3. **レスポンシブデザイン** - モバイルで横スクロールが発生する可能性がある
+   - より小さい画面でのテストが必要; メディアクエリは存在するが調整が必要な場合がある
 
 ### UX
-1. **Back to top button** (`displayBackTop()`) is created but never called
-   - Decide: Keep it or remove it?
+1. **トップに戻るボタン** (`displayBackTop()`) は作成されているが決して呼び出されない
+   - 決定: 維持するか削除するか
 
-2. **No loading states for static commands** (neovim, nix, wezterm)
-   - Option: Add subtle loading spinner if desired
+2. **静的コマンドのローディング状態なし** (neovim, nix, wezterm)
+   - オプション: 必要であれば微妙なローディングスピナーを追加
 
-3. **No command history** or autocomplete
-   - Option: Add arrow key navigation through history
+3. **コマンド履歴や自動補完なし**
+   - オプション: 履歴を矢印キーでナビゲート機能を追加
 
-4. **Cursor blink animation** only shows in input field
-   - Consider: Match cursor appearance to terminal theme
+4. **カーソル点滅アニメーションは入力フィールドにのみ表示**
+   - 検討: カーソル外観をターミナルテーマに合わせて調整
 
 ---
 
-## Common Modifications
+## 一般的な変更
 
-### Add a New Command
-1. Add click-item in HTML:
+### 新しいコマンドの追加
+1. HTMLにクリックアイテムを追加:
 ```html
 <div class="click-item" data-cmd="mycommand">
   <span class="click-num">[8]</span>
@@ -210,14 +210,14 @@ Simple terminal clear command.
 </div>
 ```
 
-2. Add case in `executeCommand()` switch:
+2. `executeCommand()` switchにcaseを追加:
 ```javascript
 case "mycommand":
   await handleMyCommand();
   break;
 ```
 
-3. Implement handler:
+3. ハンドラーを実装:
 ```javascript
 async function handleMyCommand() {
   await appendLines([
@@ -227,61 +227,61 @@ async function handleMyCommand() {
 }
 ```
 
-### Change Colors
-Edit `:root` CSS variables:
+### 色の変更
+`:root` CSS変数を編集:
 ```css
 :root {
-  --yellow: #new_color;  // Change highlight color
-  --green: #new_color;   // Change primary accent
+  --yellow: #new_color;  // ハイライト色を変更
+  --green: #new_color;   // プライマリアクセント色を変更
 }
 ```
 
-### Update GitHub Info Display
-Modify the output in `handleGithub()` function. Key elements:
+### GitHub情報表示の更新
+`handleGithub()`関数の出力を変更。重要な要素:
 - `user.name`, `user.bio`, `user.followers`, `user.following`
 - `repo.name`, `repo.description`, `repo.html_url`
-- `repoCommits` array (sorted by commits)
+- `repoCommits` 配列（コミット数でソート）
 
-### Improve Animation Speed
-- **Typing speed:** Change `delay` param in `appendLines()` (lower = faster)
-- **Fade-in animation:** Adjust `0.4s` in `.output-line` animation CSS
-- **Scroll behavior:** Modify `behavior: 'smooth'` in `scrollToBottom()`
-
----
-
-## Testing Checklist
-
-When making changes:
-- [ ] Test all 7 commands (including error case with invalid command)
-- [ ] Check GitHub API loading (may be slow, test rate limiting)
-- [ ] Verify responsive design on mobile (< 640px)
-- [ ] Check terminal scrolling behavior
-- [ ] Test keyboard input (Enter to submit)
-- [ ] Verify click-to-execute buttons work
-- [ ] Check color scheme contrast for readability
-- [ ] Test on different browsers (Chrome, Firefox, Safari)
+### アニメーション速度の改善
+- **タイピング速度:** `appendLines()`の`delay`パラメータを変更（小さいほど速い）
+- **フェードインアニメーション:** `.output-line`アニメーションCSSの`0.4s`を調整
+- **スクロール動作:** `scrollToBottom()`の`behavior: 'smooth'`を変更
 
 ---
 
-## Resources
+## テストチェックリスト
 
-**External APIs:**
+変更時のテスト:
+- [ ] すべての7コマンドをテスト（無効なコマンドのエラーケースも含む）
+- [ ] GitHub API読み込みを確認（遅い可能性がある、レート制限をテスト）
+- [ ] モバイル（< 640px）でのレスポンシブデザインを確認
+- [ ] ターミナルスクロール動作を確認
+- [ ] キーボード入力をテスト（Enterで送信）
+- [ ] クリックで実行ボタンが動作することを確認
+- [ ] 読みやすさのためのカラースキームコントラストを確認
+- [ ] 異なるブラウザでテスト（Chrome, Firefox, Safari）
+
+---
+
+## リソース
+
+**外部API:**
 - GitHub REST API: `https://api.github.com`
 - Google Fonts (JetBrains Mono): `https://fonts.googleapis.com`
 
-**Libraries:**
-- Marked.js: `https://cdn.jsdelivr.net/npm/marked/marked.min.js` (currently unused)
+**ライブラリ:**
+- Marked.js: `https://cdn.jsdelivr.net/npm/marked/marked.min.js` （現在未使用）
 
-**File References:**
-- None (single-file HTML application)
+**ファイル参照:**
+- なし（単一ファイルHTMLアプリケーション）
 
 ---
 
-## Next Steps for User
+## ユーザーへの次のステップ
 
-1. **Specific Issue?** - Describe the problem (UI bug, API issue, styling)
-2. **Feature Request?** - Specify what you want to add and where
-3. **Performance Issue?** - Profile the slow command (likely GitHub API)
-4. **Design Change?** - Show the desired look or modify colors directly
+1. **具体的な問題がありますか？** - 問題を説明してください（UIバグ、API問題、スタイリング）
+2. **機能リクエストがありますか？** - 追加したいものとその場所を指定してください
+3. **パフォーマンスの問題がありますか？** - 遅いコマンドをプロファイルしてください（おそらくGitHub API）
+4. **デザインの変更がありますか？** - 希望する外観を示すか、直接色を変更してください
 
-Always ask: What's the current behavior vs. expected behavior?
+常に確認すること: 現在の動作 vs 期待される動作は何ですか？
