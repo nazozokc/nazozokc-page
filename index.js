@@ -38,6 +38,11 @@ function createOutputLine(content, className = '') {
 }
 
 async function typeText(text, element, speed = 12) {
+  if (text.includes('<') && text.includes('>')) {
+    element.innerHTML = text;
+    scrollToBottom();
+    return;
+  }
   let i = 0;
   return new Promise(resolve => {
     const interval = setInterval(() => {
