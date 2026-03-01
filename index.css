@@ -172,13 +172,13 @@ body::before {
 }
 
 .toggle-track {
-  width: 24px;
-  height: 48px;
+  width: 48px;
+  height: 24px;
   background: var(--bg-secondary);
   border-radius: 12px;
   border: 1px solid var(--glass-border);
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   align-items: center;
   justify-content: space-between;
   padding: 3px;
@@ -199,7 +199,7 @@ body::before {
 }
 
 [data-theme="night"] .toggle-thumb {
-  transform: translateY(22px);
+  transform: translateX(22px);
 }
 
 .toggle-icon {
