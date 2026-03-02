@@ -405,9 +405,15 @@ async function handleGithub() {
 async function handleQuit() {
   terminal.innerHTML = "";
   isBlogMode = false;
+  isArticleView = false;
   if (terminalTitle) terminalTitle.textContent = 'terminal';
   if (terminalBtn) terminalBtn.classList.add('active');
   if (blogBtn) blogBtn.classList.remove('active');
+  if (terminalContainer) terminalContainer.hidden = false;
+  if (blogContainer) {
+    blogContainer.hidden = true;
+    blogContainer.classList.remove('fullscreen');
+  }
   await sleep(100);
   await initTerminal();
 }
@@ -447,11 +453,15 @@ async function handleBlog() {
     const bc = document.getElementById('blogContainer');
     terminal.innerHTML = "";
     isBlogMode = false;
+    isArticleView = false;
     if (terminalTitle) terminalTitle.textContent = 'terminal';
     if (terminalBtn) terminalBtn.classList.add('active');
     if (blogBtn) blogBtn.classList.remove('active');
     if (tc) tc.hidden = false;
-    if (bc) bc.hidden = true;
+    if (bc) {
+      bc.hidden = true;
+      bc.classList.remove('fullscreen');
+    }
     initTerminal();
   };
   terminal.appendChild(backBtn);
@@ -607,8 +617,11 @@ async function initTerminal() {
   if (terminalTitle) terminalTitle.textContent = 'terminal';
   if (terminalBtn) terminalBtn.classList.add('active');
   if (blogBtn) blogBtn.classList.remove('active');
-  const bc = document.getElementById('blogContainer');
-  if (bc) bc.classList.remove('fullscreen');
+  if (terminalContainer) terminalContainer.hidden = false;
+  if (blogContainer) {
+    blogContainer.hidden = true;
+    blogContainer.classList.remove('fullscreen');
+  }
 
   createOutputLine(
     `<span class="prompt-user">nazozokc@arch</span>:<span class="prompt-path">~</span>$ <span class="cmd-highlight">whoami</span>`
