@@ -1,5 +1,6 @@
 let terminal, cmdInput;
 let isBlogMode = false;
+let isArticleView = false;
 
 document.addEventListener('DOMContentLoaded', () => {
   terminal = document.getElementById("terminal");
@@ -79,22 +80,26 @@ document.addEventListener('DOMContentLoaded', () => {
   function switchToTerminal() {
     if (!isBlogMode) return;
     isBlogMode = false;
+    isArticleView = false;
     terminalTitle.textContent = 'terminal';
     terminalBtn.classList.add('active');
     blogBtn.classList.remove('active');
     terminalContainer.hidden = false;
     blogContainer.hidden = true;
+    blogContainer.classList.remove('fullscreen');
     handleQuit();
   }
 
   function switchToBlog() {
-    if (isBlogMode) return;
+    if (isBlogMode && !isArticleView) return;
     isBlogMode = true;
+    isArticleView = false;
     terminalTitle.textContent = 'blog';
     terminalBtn.classList.remove('active');
     blogBtn.classList.add('active');
     terminalContainer.hidden = true;
     blogContainer.hidden = false;
+    blogContainer.classList.add('fullscreen');
     renderBlogPosts();
   }
 });
@@ -408,6 +413,7 @@ function renderBlogPosts() {
   const blogContent = document.getElementById('blogContent');
   if (!blogContent) return;
   
+  isArticleView = false;
   blogContent.innerHTML = '<p class="loading">Loading...</p>';
   
   fetchBlogPosts().then(posts => {
@@ -417,6 +423,7 @@ function renderBlogPosts() {
     }
     
     let html = `
+      <button class="back-button" onclick="switchToTerminal()">← terminal</button>
       <h1 class="blog-title">blog posts</h1>
       <div class="blog-posts">
     `;
@@ -448,6 +455,7 @@ async function renderBlogPost(slug) {
   const blogContent = document.getElementById('blogContent');
   if (!blogContent) return;
   
+  isArticleView = true;
   blogContent.innerHTML = '<p class="loading">Loading...</p>';
   
   const content = await fetchBlogPost(slug);
@@ -475,7 +483,10 @@ async function renderBlogPost(slug) {
   html = '<div class="blog-post-content">' + html + '</div>';
   
   blogContent.innerHTML = `
-    <button class="back-button" onclick="renderBlogPosts()">← back</button>
+    <div class="article-nav">
+      <button class="back-button" onclick="renderBlogPosts()">← back</button>
+      <button class="back-button" onclick="switchToTerminal()">← terminal</button>
+    </div>
     ${html}
   `;
   window.scrollTo(0, 0);
@@ -495,11 +506,15 @@ function displayBackTop() {
     const bc = document.getElementById('blogContainer');
     terminal.innerHTML = "";
     isBlogMode = false;
+    isArticleView = false;
     if (terminalTitle) terminalTitle.textContent = 'terminal';
     if (terminalBtn) terminalBtn.classList.add('active');
     if (blogBtn) blogBtn.classList.remove('active');
     if (tc) tc.hidden = false;
-    if (bc) bc.hidden = true;
+    if (bc) {
+      bc.hidden = true;
+      bc.classList.remove('fullscreen');
+    }
     initTerminal();
   };
   terminal.appendChild(backTop);
@@ -515,9 +530,12 @@ function escapeHtml(text) {
 async function initTerminal() {
   terminal.innerHTML = "";
   isBlogMode = false;
+  isArticleView = false;
   if (terminalTitle) terminalTitle.textContent = 'terminal';
   if (terminalBtn) terminalBtn.classList.add('active');
   if (blogBtn) blogBtn.classList.remove('active');
+  const bc = document.getElementById('blogContainer');
+  if (bc) bc.classList.remove('fullscreen');
 
   createOutputLine(
     `<span class="prompt-user">nazozokc@arch</span>:<span class="prompt-path">~</span>$ <span class="cmd-highlight">whoami</span>`
