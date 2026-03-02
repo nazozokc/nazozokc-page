@@ -382,8 +382,9 @@ body::before {
 }
 
 .blog-container.fullscreen {
-  max-width: 800px;
-  padding-top: 3rem;
+  max-width: 100%;
+  width: 100%;
+  padding: 2rem 3rem;
 }
 
 .blog-title {

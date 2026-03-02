@@ -1,10 +1,16 @@
 let terminal, cmdInput;
 let isBlogMode = false;
 let isArticleView = false;
+let terminalTitle, terminalBtn, blogBtn, terminalContainer, blogContainer;
 
 document.addEventListener('DOMContentLoaded', () => {
   terminal = document.getElementById("terminal");
   cmdInput = document.getElementById("cmdInput");
+  terminalTitle = document.getElementById("terminalTitle");
+  terminalBtn = document.getElementById("terminalBtn");
+  blogBtn = document.getElementById("blogBtn");
+  terminalContainer = document.getElementById("terminalContainer");
+  blogContainer = document.getElementById("blogContainer");
 
   if (!terminal || !cmdInput) {
     console.error("DOM elements not found");
@@ -59,50 +65,51 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   // Terminal/Blog mode buttons
-  const terminalBtn = document.getElementById('terminalBtn');
-  const blogBtn = document.getElementById('blogBtn');
-  const terminalTitle = document.getElementById('terminalTitle');
-  const terminalContainer = document.getElementById('terminalContainer');
-  const blogContainer = document.getElementById('blogContainer');
+  const tBtn = document.getElementById('terminalBtn');
+  const bBtn = document.getElementById('blogBtn');
 
-  if (terminalBtn) {
-    terminalBtn.addEventListener('click', () => {
+  if (tBtn) {
+    tBtn.addEventListener('click', () => {
       switchToTerminal();
     });
   }
 
-  if (blogBtn) {
-    blogBtn.addEventListener('click', () => {
+  if (bBtn) {
+    bBtn.addEventListener('click', () => {
       switchToBlog();
     });
   }
+});
 
-  function switchToTerminal() {
-    if (!isBlogMode) return;
-    isBlogMode = false;
-    isArticleView = false;
-    terminalTitle.textContent = 'terminal';
-    terminalBtn.classList.add('active');
-    blogBtn.classList.remove('active');
-    terminalContainer.hidden = false;
+function switchToTerminal() {
+  if (!isBlogMode) return;
+  isBlogMode = false;
+  isArticleView = false;
+  if (terminalTitle) terminalTitle.textContent = 'terminal';
+  if (terminalBtn) terminalBtn.classList.add('active');
+  if (blogBtn) blogBtn.classList.remove('active');
+  if (terminalContainer) terminalContainer.hidden = false;
+  if (blogContainer) {
     blogContainer.hidden = true;
     blogContainer.classList.remove('fullscreen');
-    handleQuit();
   }
+  handleQuit();
+}
 
-  function switchToBlog() {
-    if (isBlogMode && !isArticleView) return;
-    isBlogMode = true;
-    isArticleView = false;
-    terminalTitle.textContent = 'blog';
-    terminalBtn.classList.remove('active');
-    blogBtn.classList.add('active');
-    terminalContainer.hidden = true;
+function switchToBlog() {
+  if (isBlogMode && !isArticleView) return;
+  isBlogMode = true;
+  isArticleView = false;
+  if (terminalTitle) terminalTitle.textContent = 'blog';
+  if (terminalBtn) terminalBtn.classList.remove('active');
+  if (blogBtn) blogBtn.classList.add('active');
+  if (terminalContainer) terminalContainer.hidden = true;
+  if (blogContainer) {
     blogContainer.hidden = false;
     blogContainer.classList.add('fullscreen');
-    renderBlogPosts();
   }
-});
+  renderBlogPosts();
+}
 
 function createOutputLine(content, className = '') {
   const line = document.createElement('div');
