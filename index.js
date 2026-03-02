@@ -1,4 +1,27 @@
 let terminal, cmdInput;
+let isBlogMode = false;
+
+// Blog posts data
+const blogPosts = [
+  {
+    title: "Neovim設定の紹介",
+    date: "2026-02-15",
+    category: "development",
+    description: "Neovimを中学生プログラマが使いこなすための設定とプラグイン紹介"
+  },
+  {
+    title: "Nix/Home Managerで環境構築",
+    date: "2026-02-01",
+    category: "configuration",
+    description: "NixとHome Managerを使って再現可能な開発環境を構築する"
+  },
+  {
+    title: "TypeScriptでCLIツールを作った",
+    date: "2026-01-20",
+    category: "development",
+    description: "TypeScriptとDenoで軽量なCLIツールを開発した話"
+  }
+];
 
 document.addEventListener('DOMContentLoaded', () => {
   terminal = document.getElementById("terminal");
@@ -42,6 +65,41 @@ document.addEventListener('DOMContentLoaded', () => {
       localStorage.setItem('theme', 'night');
     }
   });
+
+  // Terminal/Blog mode buttons
+  const terminalBtn = document.getElementById('terminalBtn');
+  const blogBtn = document.getElementById('blogBtn');
+  const terminalTitle = document.getElementById('terminalTitle');
+
+  if (terminalBtn) {
+    terminalBtn.addEventListener('click', () => {
+      switchToTerminal();
+    });
+  }
+
+  if (blogBtn) {
+    blogBtn.addEventListener('click', () => {
+      switchToBlog();
+    });
+  }
+
+  function switchToTerminal() {
+    if (!isBlogMode) return;
+    isBlogMode = false;
+    terminalTitle.textContent = 'terminal';
+    terminalBtn.classList.add('active');
+    blogBtn.classList.remove('active');
+    handleQuit();
+  }
+
+  function switchToBlog() {
+    if (isBlogMode) return;
+    isBlogMode = true;
+    terminalTitle.textContent = 'blog';
+    terminalBtn.classList.remove('active');
+    blogBtn.classList.add('active');
+    executeCommand('blog');
+  }
 });
 
 function createOutputLine(content, className = '') {
@@ -119,6 +177,9 @@ async function executeCommand(cmd) {
       break;
     case "github":
       await handleGithub();
+      break;
+    case "blog":
+      await handleBlog();
       break;
     case ":q":
       await handleQuit();
@@ -269,8 +330,54 @@ async function handleGithub() {
 
 async function handleQuit() {
   terminal.innerHTML = "";
+  isBlogMode = false;
+  if (terminalTitle) terminalTitle.textContent = 'terminal';
+  if (terminalBtn) terminalBtn.classList.add('active');
+  if (blogBtn) blogBtn.classList.remove('active');
   await sleep(100);
   await initTerminal();
+}
+
+async function handleBlog() {
+  await appendLines([
+    "",
+    "<span class='accent'>blog posts:</span>",
+    ""
+  ], 10);
+
+  for (const post of blogPosts) {
+    const postDiv = document.createElement('div');
+    postDiv.className = 'repo-item';
+    postDiv.innerHTML = `
+      <div class="repo-name">${escapeHtml(post.title)}</div>
+      <div class="repo-desc">${escapeHtml(post.description)}</div>
+      <span class="muted">${escapeHtml(post.date)} / ${escapeHtml(post.category)}</span>
+    `;
+    terminal.appendChild(postDiv);
+    await sleep(100);
+    scrollToBottom();
+  }
+
+  await sleep(200);
+  createOutputLine("");
+
+  // Add back button for blog mode
+  const backBtn = document.createElement("button");
+  backBtn.className = "back-top";
+  backBtn.type = "button";
+  backBtn.innerHTML = "← terminalに戻る";
+  backBtn.onclick = () => {
+    terminal.innerHTML = "";
+    isBlogMode = false;
+    if (terminalTitle) terminalTitle.textContent = 'terminal';
+    if (terminalBtn) terminalBtn.classList.add('active');
+    if (blogBtn) blogBtn.classList.remove('active');
+    initTerminal();
+  };
+  terminal.appendChild(backBtn);
+  scrollToBottom();
+
+  createOutputLine("<span class='muted'>select command from below ↓</span>");
 }
 
 function handleClear() {
@@ -284,6 +391,10 @@ function displayBackTop() {
   backTop.innerHTML = "← [top]";
   backTop.onclick = () => {
     terminal.innerHTML = "";
+    isBlogMode = false;
+    if (terminalTitle) terminalTitle.textContent = 'terminal';
+    if (terminalBtn) terminalBtn.classList.add('active');
+    if (blogBtn) blogBtn.classList.remove('active');
     initTerminal();
   };
   terminal.appendChild(backTop);
@@ -298,6 +409,10 @@ function escapeHtml(text) {
 
 async function initTerminal() {
   terminal.innerHTML = "";
+  isBlogMode = false;
+  if (terminalTitle) terminalTitle.textContent = 'terminal';
+  if (terminalBtn) terminalBtn.classList.add('active');
+  if (blogBtn) blogBtn.classList.remove('active');
 
   createOutputLine(
     `<span class="prompt-user">nazozokc@arch</span>:<span class="prompt-path">~</span>$ <span class="cmd-highlight">whoami</span>`

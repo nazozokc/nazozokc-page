@@ -126,7 +126,40 @@ body::before {
 
 .top-bar-links {
   display: flex;
-  gap: 1rem;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.nav-button {
+  background: transparent;
+  border: 1px solid var(--blue);
+  color: var(--blue);
+  padding: 0.35rem 0.8rem;
+  border-radius: 20px;
+  font-family: inherit;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.nav-button:hover {
+  background: rgba(139, 164, 176, 0.15);
+  color: var(--yellow);
+  border-color: var(--yellow);
+  box-shadow: 0 0 10px var(--glow-blue);
+}
+
+.nav-button.active {
+  background: var(--blue);
+  color: var(--bg);
+  box-shadow: 0 0 15px var(--glow-blue);
+}
+
+.nav-button.active:hover {
+  background: var(--yellow);
+  color: var(--bg);
+  border-color: var(--yellow);
+  box-shadow: 0 0 15px var(--glow-yellow);
 }
 
 .top-bar-links a {
