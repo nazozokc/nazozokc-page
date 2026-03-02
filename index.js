@@ -274,12 +274,44 @@ async function handleWezterm() {
   ], 10);
 }
 
+const CACHE_KEY_USER = 'github_user';
+const CACHE_KEY_REPOS_ALL = 'github_repos_all';
+const CACHE_KEY_REPOS_RECENT = 'github_repos_recent';
+const CACHE_EXPIRY = 5 * 60 * 1000;
+
+function getCachedData(key) {
+  const cached = localStorage.getItem(key);
+  if (!cached) return null;
+  try {
+    const { data, timestamp } = JSON.parse(cached);
+    if (Date.now() - timestamp < CACHE_EXPIRY) {
+      return data;
+    }
+  } catch {}
+  return null;
+}
+
+function setCachedData(key, data) {
+  localStorage.setItem(key, JSON.stringify({ data, timestamp: Date.now() }));
+}
+
 async function handleGithub() {
   const loading = createOutputLine('<span class="loading">loading github info</span>');
 
   try {
-    const userRes = await fetch("https://api.github.com/users/nazozokc");
-    const user = await userRes.json();
+    const cachedUser = getCachedData(CACHE_KEY_USER);
+    let user;
+    if (cachedUser) {
+      user = cachedUser;
+    } else {
+      const userRes = await fetch("https://api.github.com/users/nazozokc");
+      if (userRes.status === 403 || userRes.status === 429) {
+        throw new Error('rate_limit');
+      }
+      if (!userRes.ok) throw new Error('network');
+      user = await userRes.json();
+      setCachedData(CACHE_KEY_USER, user);
+    }
     loading.remove();
     
     createOutputLine("<span class='accent'>GitHub Profile:</span>");
@@ -293,28 +325,53 @@ async function handleGithub() {
 
     const loading2 = createOutputLine('<span class="loading">loading commit stats</span>');
 
-    const reposRes = await fetch("https://api.github.com/users/nazozokc/repos?per_page=100");
-    const repos = await reposRes.json();
+    let repos;
+    const cachedRepos = getCachedData(CACHE_KEY_REPOS_ALL);
+    if (cachedRepos) {
+      repos = cachedRepos;
+    } else {
+      const reposRes = await fetch("https://api.github.com/users/nazozokc/repos?per_page=100");
+      if (reposRes.status === 403 || reposRes.status === 429) {
+        throw new Error('rate_limit');
+      }
+      if (!reposRes.ok) throw new Error('network');
+      repos = await reposRes.json();
+      setCachedData(CACHE_KEY_REPOS_ALL, repos);
+    }
+    
     const ownRepos = repos.filter(r => !r.fork);
 
-    const repoCommits = [];
-    let totalCommits = 0;
-
-    for (const repo of ownRepos) {
+    const commitPromises = ownRepos.map(async (repo) => {
       try {
         const commitsRes = await fetch(`https://api.github.com/repos/nazozokc/${repo.name}/commits?per_page=1`);
+        if (commitsRes.status === 403 || commitsRes.status === 429) {
+          return { name: repo.name, commits: 0, url: repo.html_url, rateLimited: true };
+        }
         const linkHeader = commitsRes.headers.get('link') || '';
         const lastPageMatch = linkHeader.match(/page=(\d+)>; rel="last"/);
         const commitCount = lastPageMatch ? parseInt(lastPageMatch[1]) : 1;
-        
-        repoCommits.push({ name: repo.name, commits: commitCount, url: repo.html_url });
-        totalCommits += commitCount;
+        return { name: repo.name, commits: commitCount, url: repo.html_url };
       } catch {
-        repoCommits.push({ name: repo.name, commits: 0, url: repo.html_url });
+        return { name: repo.name, commits: 0, url: repo.html_url };
       }
+    });
+
+    const repoCommitsResults = await Promise.all(commitPromises);
+    const repoCommits = [];
+    let totalCommits = 0;
+    let hasRateLimit = false;
+
+    for (const result of repoCommitsResults) {
+      repoCommits.push({ name: result.name, commits: result.commits, url: result.url });
+      totalCommits += result.commits;
+      if (result.rateLimited) hasRateLimit = true;
     }
 
     loading2.remove();
+
+    if (hasRateLimit) {
+      createOutputLine('<span class="warning-msg">warning: rate limit hit, some commit counts may be inaccurate</span>');
+    }
 
     createOutputLine(`<span class='accent'>total commits:</span> ${totalCommits}`);
     createOutputLine("");
@@ -331,9 +388,17 @@ async function handleGithub() {
 
     createOutputLine('<a href="https://github.com/nazozokc" target="_blank" rel="noopener noreferrer" class="repo-url">view all repos →</a>');
 
+    displayBackTop();
+
   } catch (err) {
     loading.remove();
-    createOutputLine('<span class="error-msg">error: failed to load github info</span>');
+    if (err.message === 'rate_limit') {
+      createOutputLine('<span class="error-msg">error: GitHub API rate limit exceeded. Please try again later.</span>');
+    } else if (err.message === 'network') {
+      createOutputLine('<span class="error-msg">error: network failure. Please check your connection.</span>');
+    } else {
+      createOutputLine('<span class="error-msg">error: failed to load github info</span>');
+    }
   }
 }
 
@@ -579,8 +644,21 @@ async function initTerminal() {
   const loading = createOutputLine('<span class="loading">loading repositories</span>');
 
   try {
-    const response = await fetch("https://api.github.com/users/nazozokc/repos?sort=updated");
-    const repos = await response.json();
+    let repos;
+    const cachedRepos = getCachedData(CACHE_KEY_REPOS_RECENT);
+    if (cachedRepos) {
+      repos = cachedRepos;
+    } else {
+      const response = await fetch("https://api.github.com/users/nazozokc/repos?sort=updated");
+      if (!response.ok) {
+        if (response.status === 403 || response.status === 429) {
+          throw new Error('rate_limit');
+        }
+        throw new Error('network');
+      }
+      repos = await response.json();
+      setCachedData(CACHE_KEY_REPOS_RECENT, repos);
+    }
     loading.remove();
 
     const filteredRepos = repos.filter(r => !r.fork).slice(0, 6);
@@ -607,6 +685,12 @@ async function initTerminal() {
 
   } catch (err) {
     loading.remove();
-    createOutputLine('<span class="error-msg">error: failed to load repositories</span>');
+    if (err.message === 'rate_limit') {
+      createOutputLine('<span class="error-msg">error: GitHub API rate limit exceeded</span>');
+    } else if (err.message === 'network') {
+      createOutputLine('<span class="error-msg">error: network failure</span>');
+    } else {
+      createOutputLine('<span class="error-msg">error: failed to load repositories</span>');
+    }
   }
 }

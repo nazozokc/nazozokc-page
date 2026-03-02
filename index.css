@@ -769,6 +769,11 @@ body::before {
   text-shadow: 0 0 10px rgba(196, 116, 110, 0.5);
 }
 
+.warning-msg {
+  color: var(--yellow);
+  text-shadow: 0 0 10px rgba(196, 178, 138, 0.5);
+}
+
 /* Repository item */
 .repo-item {
   padding: 1rem 1.25rem;
