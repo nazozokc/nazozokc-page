@@ -17,7 +17,7 @@ nazozokcのポートフォリオサイト。GitHub Pagesでホストされてい
 | index.js | 共通JS（GitHub API、blog読み込み） |
 | index.css | 共通スタイル |
 | blog-index.json | ブログ記事のインデックス |
-| blog/*.md | ブログ記事（Markdown） |
+| blog/*.md | ブログ記事（Markdown）  |
 
 ---
 
