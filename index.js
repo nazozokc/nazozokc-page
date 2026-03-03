@@ -1,4 +1,5 @@
 const CACHE_KEY_REPOS = 'github_repos';
+const CACHE_KEY_BLOG = 'blog_posts';
 const CACHE_EXPIRY = 5 * 60 * 1000;
 
 function getCachedData(key) {
@@ -93,8 +94,48 @@ async function loadRepositories() {
   }
 }
 
+async function loadBlog() {
+  const container = document.getElementById('blogContainer');
+  if (!container) return;
+
+  try {
+    let posts;
+    const cachedPosts = getCachedData(CACHE_KEY_BLOG);
+    if (cachedPosts) {
+      posts = cachedPosts;
+    } else {
+      const indexResponse = await fetch('blog-index.json');
+      if (!indexResponse.ok) {
+        throw new Error('Failed to load blog index');
+      }
+      posts = await indexResponse.json();
+      setCachedData(CACHE_KEY_BLOG, posts);
+    }
+
+    if (!posts || posts.length === 0) {
+      container.innerHTML = '<p class="loading">No blog posts found</p>';
+      return;
+    }
+
+    container.innerHTML = posts.map(post => `
+      <a href="blog/${post.slug}.md" target="_blank" rel="noopener noreferrer" class="blog-card">
+        <div class="blog-header">
+          <span class="blog-emoji">${post.emoji}</span>
+          <span class="blog-date">${post.date}</span>
+        </div>
+        <h3 class="blog-title">${escapeHtml(post.title)}</h3>
+        <span class="blog-category">${escapeHtml(post.category)}</span>
+      </a>
+    `).join('');
+
+  } catch (err) {
+    container.innerHTML = '<p class="error-msg">Failed to load blog posts</p>';
+  }
+}
+
 document.addEventListener('DOMContentLoaded', () => {
   loadRepositories();
+  loadBlog();
 
   const themeToggle = document.getElementById('themeToggle');
   const savedTheme = localStorage.getItem('theme');

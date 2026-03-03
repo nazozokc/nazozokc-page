@@ -405,6 +405,64 @@ body::before {
   background: var(--yellow);
 }
 
+/* Blog */
+.blog-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1rem;
+}
+
+.blog-card {
+  display: block;
+  text-decoration: none;
+  color: inherit;
+  background: var(--glass);
+  border: 1px solid var(--glass-border);
+  border-radius: 14px;
+  padding: 1rem 1.25rem;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.blog-card:hover {
+  background: rgba(255, 255, 255, 0.12);
+  transform: translateY(-3px) scale(1.01);
+  box-shadow: 0 8px 24px var(--shadow);
+  border-color: var(--green);
+}
+
+.blog-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+}
+
+.blog-emoji {
+  font-size: 1.25rem;
+}
+
+.blog-date {
+  font-size: 0.75rem;
+  color: var(--gray);
+}
+
+.blog-title {
+  font-weight: 600;
+  font-size: 1rem;
+  color: var(--fg);
+  margin: 0 0 0.5rem 0;
+  line-height: 1.4;
+}
+
+.blog-category {
+  display: inline-block;
+  font-size: 0.7rem;
+  padding: 0.2rem 0.5rem;
+  background: var(--bg-secondary);
+  border-radius: 20px;
+  color: var(--gray);
+}
+
 /* Loading */
 .loading {
   color: var(--gray);
