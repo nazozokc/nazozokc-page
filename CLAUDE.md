@@ -14,7 +14,6 @@ nazozokcのポートフォリオサイト。GitHub Pagesでホストされてい
 | ファイル | 説明 |
 |---|---|
 | index.html | メインページ |
-| blog.html | ブログ一覧ページ |
 | index.js | 共通JS（GitHub API、blog読み込み） |
 | index.css | 共通スタイル |
 | blog-index.json | ブログ記事のインデックス |
