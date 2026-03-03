@@ -205,7 +205,9 @@ async function loadBlogList() {
     const slugs = await manifestResponse.json();
 
     const postFiles = await Promise.all(
-      slugs.map(slug => fetch(`blog/${slug}.md`).then(r => r.ok ? r.text() : null))
+      slugs.map(slug => fetch(`blog/${slug}.md`)
+        .then(r => r.ok ? r.text() : Promise.resolve(null))
+        .catch(() => null))
     );
 
     const posts = [];
@@ -232,8 +234,8 @@ async function loadBlogList() {
     container.innerHTML = posts.map(post => `
       <a href="#" class="blog-card" data-post="${post.slug}">
         <div class="blog-header">
-          <span class="blog-emoji">${post.emoji}</span>
-          <span class="blog-date">${post.date}</span>
+          <span class="blog-emoji">${escapeHtml(post.emoji)}</span>
+          <span class="blog-date">${escapeHtml(post.date)}</span>
         </div>
         <h3 class="blog-title">${escapeHtml(post.title)}</h3>
         <span class="blog-category">${escapeHtml(post.category)}</span>
@@ -292,11 +294,11 @@ async function loadBlogPost(slug) {
         <article class="post-content">
           <header class="post-header">
             <div class="post-meta">
-              <span class="post-emoji">${frontmatter?.emoji || ''}</span>
-              <span class="post-date">${frontmatter?.date || ''}</span>
-              <span class="post-category">${frontmatter?.category || ''}</span>
+              <span class="post-emoji">${escapeHtml(frontmatter?.emoji || '')}</span>
+              <span class="post-date">${escapeHtml(frontmatter?.date || '')}</span>
+              <span class="post-category">${escapeHtml(frontmatter?.category || '')}</span>
             </div>
-            <h1 class="post-title">${frontmatter?.title || slug}</h1>
+            <h1 class="post-title">${escapeHtml(frontmatter?.title || slug)}</h1>
           </header>
           <div class="markdown-body">${html}</div>
         </article>
@@ -322,8 +324,10 @@ async function loadBlogPost(slug) {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-  loadRepositories();
-  loadContributionStats();
+  Promise.all([
+    loadRepositories(),
+    loadContributionStats()
+  ]);
 
   document.querySelectorAll('[data-view]').forEach(link => {
     link.addEventListener('click', (e) => {
