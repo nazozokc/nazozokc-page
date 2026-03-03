@@ -1,4 +1,5 @@
 const CACHE_KEY_REPOS = 'github_repos';
+const CACHE_KEY_EVENTS = 'github_events';
 const CACHE_EXPIRY = 5 * 60 * 1000;
 
 let currentView = 'home';
@@ -143,6 +144,55 @@ async function loadRepositories() {
   }
 }
 
+async function loadContributionStats() {
+  const totalEl = document.getElementById('totalContributions');
+  const todayEl = document.getElementById('todayContributions');
+  if (!totalEl || !todayEl) return;
+
+  try {
+    let events;
+    const cachedEvents = getCachedData(CACHE_KEY_EVENTS);
+    if (cachedEvents) {
+      events = cachedEvents;
+    } else {
+      const response = await fetch('https://api.github.com/users/nazozokc/events?per_page=100');
+      if (!response.ok) {
+        if (response.status === 403 || response.status === 429) {
+          throw new Error('rate_limit');
+        }
+        throw new Error('network');
+      }
+      events = await response.json();
+      setCachedData(CACHE_KEY_EVENTS, events);
+    }
+
+    const now = new Date();
+    const today = now.toDateString();
+    const ninetyDaysAgo = new Date(now.getTime() - 90 * 24 * 60 * 60 * 1000);
+
+    let totalCount = 0;
+    let todayCount = 0;
+
+    for (const event of events) {
+      if (event.type !== 'PushEvent') continue;
+      const eventDate = new Date(event.created_at);
+      if (eventDate < ninetyDaysAgo) continue;
+
+      totalCount += event.payload.commits?.length || 0;
+      if (eventDate.toDateString() === today) {
+        todayCount += event.payload.commits?.length || 0;
+      }
+    }
+
+    totalEl.textContent = totalCount;
+    todayEl.textContent = todayCount;
+
+  } catch (err) {
+    totalEl.textContent = '-';
+    todayEl.textContent = '-';
+  }
+}
+
 async function loadBlogList() {
   const container = document.getElementById('blogContainer');
   if (!container) return;
@@ -273,6 +323,7 @@ async function loadBlogPost(slug) {
 
 document.addEventListener('DOMContentLoaded', () => {
   loadRepositories();
+  loadContributionStats();
 
   document.querySelectorAll('[data-view]').forEach(link => {
     link.addEventListener('click', (e) => {
