@@ -1,5 +1,4 @@
 const CACHE_KEY_REPOS = 'github_repos';
-const CACHE_KEY_BLOG = 'blog_posts';
 const CACHE_EXPIRY = 5 * 60 * 1000;
 
 let currentView = 'home';
@@ -25,6 +24,25 @@ function escapeHtml(text) {
   const div = document.createElement('div');
   div.textContent = text;
   return div.innerHTML;
+}
+
+function parseFrontmatter(markdown) {
+  const match = markdown.match(/^---\n([\s\S]*?)\n---/);
+  if (!match) return null;
+  
+  const frontmatter = {};
+  const lines = match[1].split('\n');
+  for (const line of lines) {
+    const colonIndex = line.indexOf(':');
+    if (colonIndex === -1) continue;
+    const key = line.slice(0, colonIndex).trim();
+    let value = line.slice(colonIndex + 1).trim();
+    if (value.startsWith('"') && value.endsWith('"')) {
+      value = value.slice(1, -1);
+    }
+    frontmatter[key] = value;
+  }
+  return frontmatter;
 }
 
 function switchView(view) {
@@ -130,13 +148,33 @@ async function loadBlogList() {
   if (!container) return;
 
   try {
-    const indexResponse = await fetch('blog-index.json');
-    if (!indexResponse.ok) {
-      throw new Error('Failed to load blog index');
+    const manifestResponse = await fetch('blog-manifest.json');
+    if (!manifestResponse.ok) {
+      throw new Error('Failed to load blog manifest');
     }
-    const posts = await indexResponse.json();
+    const slugs = await manifestResponse.json();
 
-    if (!posts || posts.length === 0) {
+    const postFiles = await Promise.all(
+      slugs.map(slug => fetch(`blog/${slug}.md`).then(r => r.ok ? r.text() : null))
+    );
+
+    const posts = [];
+    for (let i = 0; i < slugs.length; i++) {
+      const markdown = postFiles[i];
+      if (!markdown) continue;
+      const frontmatter = parseFrontmatter(markdown);
+      if (frontmatter) {
+        posts.push({
+          slug: slugs[i],
+          title: frontmatter.title || slugs[i],
+          emoji: frontmatter.emoji || '',
+          date: frontmatter.date || '',
+          category: frontmatter.category || ''
+        });
+      }
+    }
+
+    if (posts.length === 0) {
       container.innerHTML = '<p class="loading">No blog posts found</p>';
       return;
     }
@@ -195,22 +233,20 @@ async function loadBlogPost(slug) {
     }
     const markdown = await response.text();
 
-    const indexResponse = await fetch('blog-index.json');
-    const posts = await indexResponse.json();
-    const post = posts.find(p => p.slug === slug);
-
-    const html = marked.parse(markdown);
+    const frontmatter = parseFrontmatter(markdown);
+    const html = marked.parse(markdown.replace(/^---[\s\S]*?---\n/, ''));
+    
     postContainer.innerHTML = `
       <div class="post-card">
         <a href="#" class="back-link" id="backToList">← 一覧に戻る</a>
         <article class="post-content">
           <header class="post-header">
             <div class="post-meta">
-              <span class="post-emoji">${post?.emoji || ''}</span>
-              <span class="post-date">${post?.date || ''}</span>
-              <span class="post-category">${post?.category || ''}</span>
+              <span class="post-emoji">${frontmatter?.emoji || ''}</span>
+              <span class="post-date">${frontmatter?.date || ''}</span>
+              <span class="post-category">${frontmatter?.category || ''}</span>
             </div>
-            <h1 class="post-title">${post?.title || slug}</h1>
+            <h1 class="post-title">${frontmatter?.title || slug}</h1>
           </header>
           <div class="markdown-body">${html}</div>
         </article>
@@ -233,10 +269,6 @@ async function loadBlogPost(slug) {
       showBlogList();
     });
   }
-}
-
-function loadBlog() {
-  loadBlogList();
 }
 
 document.addEventListener('DOMContentLoaded', () => {
