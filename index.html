@@ -3,20 +3,20 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="nazozokcのポートフォリオ。中学生プログラマとしての活動や技術スタック、プロジェクト情報を提供しています。">
+<meta name="description" content="nazozokcのポートフォリオ。中学生プログラマとしての活動や技術スタック、プロジェクト情報をを提供しています。">
 <title>nazozokc</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="index.css">
 </head>
 <body>
 <!-- Top bar -->
 <header class="top-bar" role="banner">
   <div class="top-bar-inner">
-    <div class="top-bar-title">
-      <span class="status-dot" aria-hidden="true"></span>
-      <span id="terminalTitle" class="terminal-title">terminal</span>
+    <div class="profile-mini">
+      <div class="avatar" aria-hidden="true">@</div>
+      <span class="username">nazozokc</span>
     </div>
     <nav class="top-bar-links" aria-label="Navigation">
       <button id="themeToggle" class="theme-toggle" aria-label="Toggle theme">
@@ -27,65 +27,68 @@
           </span>
         </span>
       </button>
-      <button id="terminalBtn" class="nav-button active" aria-label="Switch to terminal mode">terminal</button>
-      <button id="blogBtn" class="nav-button" aria-label="Switch to blog mode">blog</button>
-      <a href="https://x.com/@NazozoK6519" target="_blank" rel="noopener noreferrer" class="link-x">X</a>
-      <a href="https://github.com/nazozokc" target="_blank" rel="noopener noreferrer" class="link-gh">GitHub</a>
+      <a href="https://x.com/@NazozoK6519" target="_blank" rel="noopener noreferrer" class="social-link">X</a>
+      <a href="https://github.com/nazozokc" target="_blank" rel="noopener noreferrer" class="social-link">GitHub</a>
     </nav>
   </div>
 </header>
 
-<!-- Terminal container -->
-<main id="terminalContainer" class="terminal-container" role="main">
-  <aside class="terminal-sidebar" aria-label="Command list">
-    <div class="sidebar-header" aria-hidden="true">[commands]</div>
-    <nav class="sidebar-commands" aria-label="Command navigation">
-      <div class="sidebar-item" data-cmd="neovim" role="button" tabindex="0">
-        <span class="sidebar-num">[1]</span>
-        <span class="sidebar-cmd">neovim</span>
-      </div>
-      <div class="sidebar-item" data-cmd="nix" role="button" tabindex="0">
-        <span class="sidebar-num">[2]</span>
-        <span class="sidebar-cmd">nix</span>
-      </div>
-      <div class="sidebar-item" data-cmd="wezterm" role="button" tabindex="0">
-        <span class="sidebar-num">[3]</span>
-        <span class="sidebar-cmd">wezterm</span>
-      </div>
-      <div class="sidebar-item" data-cmd="X" role="button" tabindex="0">
-        <span class="sidebar-num">[4]</span>
-        <span class="sidebar-cmd">X</span>
-      </div>
-      <div class="sidebar-item" data-cmd="github" role="button" tabindex="0">
-        <span class="sidebar-num">[5]</span>
-        <span class="sidebar-cmd">github</span>
-      </div>
-      <div class="sidebar-item" data-cmd=":q" role="button" tabindex="0">
-        <span class="sidebar-num">[6]</span>
-        <span class="sidebar-cmd">:q</span>
-      </div>
-      <div class="sidebar-item" data-cmd="clear" role="button" tabindex="0">
-        <span class="sidebar-num">[7]</span>
-        <span class="sidebar-cmd">clear</span>
-      </div>
-    </nav>
-  </aside>
-
-  <div class="terminal-main">
-    <div id="terminal" class="terminal-output" aria-live="polite"></div>
-
-    <!-- Command input -->
-    <div class="input-line" role="search">
-      <span class="prompt-user" aria-hidden="true">nazozokc@arch</span>:<span class="prompt-path" aria-hidden="true">~</span>$
-      <input id="cmdInput" type="text" autocomplete="off" autofocus aria-label="Command input">
-      <span class="cursor-blink" aria-hidden="true">▌</span>
+<!-- Main content -->
+<main class="main-content" role="main">
+  <!-- Hero section -->
+  <section class="hero-card">
+    <div class="hero-content">
+      <h1 class="hero-title">nazozokc</h1>
+      <p class="hero-subtitle">中学生プログラマ</p>
+      <p class="hero-desc">Arch Linux / Neovim / TypeScript</p>
+      <p class="hero-desc">API開発・CLIツール・環境構築が好き</p>
     </div>
-  </div>
-</main>
+  </section>
 
-<!-- Blog container -->
-<main id="blogContainer" class="blog-container" role="main" hidden>
-  <div id="blogContent" class="blog-content"></div>
+  <!-- Skills section -->
+  <section class="card-section">
+    <h2 class="section-title">Skills</h2>
+    <div class="skills-grid">
+      <span class="skill-tag primary">TypeScript</span>
+      <span class="skill-tag secondary">JavaScript</span>
+      <span class="skill-tag secondary">Node.js</span>
+      <span class="skill-tag secondary">React</span>
+      <span class="skill-tag secondary">Linux</span>
+      <span class="skill-tag secondary">Neovim</span>
+      <span class="skill-tag secondary">Nix</span>
+      <span class="skill-tag secondary">Docker</span>
+    </div>
+  </section>
+
+  <!-- Environment section -->
+  <section class="card-section">
+    <h2 class="section-title">Environment</h2>
+    <div class="env-grid">
+      <div class="env-card">
+        <h3 class="env-title">Neovim</h3>
+        <p class="env-detail">lazy.nvim / kanagawa-dragon</p>
+        <p class="env-detail">LSP: lua_ls, ts_ls, nixd</p>
+      </div>
+      <div class="env-card">
+        <h3 class="env-title">Nix</h3>
+        <p class="env-detail">home-manager / nix-darwin</p>
+        <p class="env-detail">shell: fish</p>
+      </div>
+      <div class="env-card">
+        <h3 class="env-title">WezTerm</h3>
+        <p class="env-detail">lua config / kanagawa theme</p>
+        <p class="env-detail">opacity: 0.90</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Repositories section -->
+  <section class="card-section">
+    <h2 class="section-title">Repositories</h2>
+    <div id="reposContainer" class="repos-grid">
+      <p class="loading">Loading...</p>
+    </div>
+  </section>
 </main>
 
 <script src="index.js"></script>
