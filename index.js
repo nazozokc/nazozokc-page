@@ -283,11 +283,11 @@ async function loadZennArticles() {
     container.innerHTML = articles.map(article => `
       <a href="https://zenn.dev/nazozokc/articles/${article.slug}" target="_blank" rel="noopener noreferrer" class="blog-card">
         <div class="blog-header">
-          <span class="blog-emoji">📝</span>
-          <span class="blog-date">${new Date(article.created_at).toLocaleDateString('ja-JP')}</span>
+          <span class="blog-emoji">${escapeHtml(article.emoji || '📝')}</span>
+          <span class="blog-date">${new Date(article.published_at).toLocaleDateString('ja-JP')}</span>
         </div>
         <h3 class="blog-title">${escapeHtml(article.title)}</h3>
-        <span class="blog-category">${escapeHtml(article.tags?.[0] || '')}</span>
+        <span class="blog-category">${escapeHtml(article.article_type || '')}</span>
       </a>
     `).join('');
 
