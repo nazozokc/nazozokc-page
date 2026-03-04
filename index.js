@@ -49,6 +49,7 @@ function parseFrontmatter(markdown) {
 function switchView(view) {
   const homeView = document.getElementById('homeView');
   const blogView = document.getElementById('blogView');
+  const zennView = document.getElementById('zennView');
   const navLinks = document.querySelectorAll('[data-view]');
   
   currentView = view;
@@ -56,12 +57,20 @@ function switchView(view) {
   if (view === 'home') {
     if (homeView) homeView.style.display = 'block';
     if (blogView) blogView.style.display = 'none';
+    if (zennView) zennView.style.display = 'none';
     currentPostSlug = null;
     window.scrollTo(0, 0);
   } else if (view === 'blog') {
     if (homeView) homeView.style.display = 'none';
     if (blogView) blogView.style.display = 'block';
+    if (zennView) zennView.style.display = 'none';
     loadBlogList();
+    window.scrollTo(0, 0);
+  } else if (view === 'zenn') {
+    if (homeView) homeView.style.display = 'none';
+    if (blogView) blogView.style.display = 'none';
+    if (zennView) zennView.style.display = 'block';
+    loadZennArticles();
     window.scrollTo(0, 0);
   }
   
@@ -251,6 +260,39 @@ async function loadBlogList() {
 
   } catch (err) {
     container.innerHTML = '<p class="error-msg">Failed to load blog posts</p>';
+  }
+}
+
+async function loadZennArticles() {
+  const container = document.getElementById('zennContainer');
+  if (!container) return;
+
+  try {
+    const response = await fetch('https://api.rss2json.com/v1/api.json?rss_url=https://zenn.dev/nazozokc/feed');
+    if (!response.ok) {
+      throw new Error('Failed to fetch Zenn articles');
+    }
+    const data = await response.json();
+    const articles = data.items || [];
+
+    if (articles.length === 0) {
+      container.innerHTML = '<p class="loading">No articles found</p>';
+      return;
+    }
+
+    container.innerHTML = articles.map(article => `
+      <a href="${article.link}" target="_blank" rel="noopener noreferrer" class="blog-card">
+        <div class="blog-header">
+          <span class="blog-emoji">📝</span>
+          <span class="blog-date">${new Date(article.pubDate).toLocaleDateString('ja-JP')}</span>
+        </div>
+        <h3 class="blog-title">${escapeHtml(article.title)}</h3>
+        <span class="blog-category">${escapeHtml(article.categories?.[0] || '')}</span>
+      </a>
+    `).join('');
+
+  } catch (err) {
+    container.innerHTML = '<p class="error-msg">Failed to load Zenn articles</p>';
   }
 }
 
