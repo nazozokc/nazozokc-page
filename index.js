@@ -268,12 +268,12 @@ async function loadZennArticles() {
   if (!container) return;
 
   try {
-    const response = await fetch('https://api.rss2json.com/v1/api.json?rss_url=https://zenn.dev/nazozokc/feed');
+    const response = await fetch('https://zenn.dev/api/articles?username=nazozokc&order=latest');
     if (!response.ok) {
       throw new Error('Failed to fetch Zenn articles');
     }
     const data = await response.json();
-    const articles = data.items || [];
+    const articles = data.articles || [];
 
     if (articles.length === 0) {
       container.innerHTML = '<p class="loading">No articles found</p>';
@@ -281,17 +281,18 @@ async function loadZennArticles() {
     }
 
     container.innerHTML = articles.map(article => `
-      <a href="${article.link}" target="_blank" rel="noopener noreferrer" class="blog-card">
+      <a href="https://zenn.dev/nazozokc/articles/${article.slug}" target="_blank" rel="noopener noreferrer" class="blog-card">
         <div class="blog-header">
           <span class="blog-emoji">📝</span>
-          <span class="blog-date">${new Date(article.pubDate).toLocaleDateString('ja-JP')}</span>
+          <span class="blog-date">${new Date(article.created_at).toLocaleDateString('ja-JP')}</span>
         </div>
         <h3 class="blog-title">${escapeHtml(article.title)}</h3>
-        <span class="blog-category">${escapeHtml(article.categories?.[0] || '')}</span>
+        <span class="blog-category">${escapeHtml(article.tags?.[0] || '')}</span>
       </a>
     `).join('');
 
   } catch (err) {
+    console.error('Zenn load error:', err);
     container.innerHTML = '<p class="error-msg">Failed to load Zenn articles</p>';
   }
 }
