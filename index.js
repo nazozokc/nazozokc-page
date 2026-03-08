@@ -56,7 +56,9 @@ function getCachedData(key) {
   try {
     const { data, timestamp } = JSON.parse(cached);
     if (Date.now() - timestamp < CACHE_EXPIRY) return data;
-  } catch { }
+  } catch (err) {
+    console.error(`Cache parse error for ${key}:`, err);
+  }
   return null;
 }
 
@@ -220,7 +222,8 @@ async function loadContributionStats() {
     animateCount(totalEl, totalCount);
     animateCount(todayEl, todayCount);
 
-  } catch {
+  } catch (err) {
+    console.error('Contribution stats load error:', err);
     totalEl.textContent = '-';
     todayEl.textContent = '-';
   }
@@ -284,7 +287,8 @@ async function loadBlogList() {
       });
     });
 
-  } catch {
+  } catch (err) {
+    console.error('Blog list load error:', err);
     container.innerHTML = '<p class="error-msg">Failed to load blog posts</p>';
   }
 }
@@ -378,7 +382,8 @@ async function loadBlogPost(slug) {
       showBlogList();
     });
 
-  } catch {
+  } catch (err) {
+    console.error('Blog post load error:', err);
     postContainer.innerHTML = `
       <div class="post-card">
         <a href="#" class="back-link" id="backToList">← 一覧に戻る</a>
@@ -397,19 +402,25 @@ async function loadBlogPost(slug) {
 document.addEventListener('DOMContentLoaded', () => {
   // Theme
   const themeToggle = document.getElementById('themeToggle');
-  if (localStorage.getItem('theme') === 'night') {
+  const savedTheme = localStorage.getItem('theme');
+  if (savedTheme === 'night') {
     document.documentElement.setAttribute('data-theme', 'night');
+    if (themeToggle) themeToggle.setAttribute('aria-pressed', 'true');
   }
-  themeToggle?.addEventListener('click', () => {
-    const isNight = document.documentElement.getAttribute('data-theme') === 'night';
-    if (isNight) {
-      document.documentElement.removeAttribute('data-theme');
-      localStorage.setItem('theme', 'day');
-    } else {
-      document.documentElement.setAttribute('data-theme', 'night');
-      localStorage.setItem('theme', 'night');
-    }
-  });
+  if (themeToggle) {
+    themeToggle.addEventListener('click', () => {
+      const isNight = document.documentElement.getAttribute('data-theme') === 'night';
+      if (isNight) {
+        document.documentElement.removeAttribute('data-theme');
+        localStorage.setItem('theme', 'day');
+        themeToggle.setAttribute('aria-pressed', 'false');
+      } else {
+        document.documentElement.setAttribute('data-theme', 'night');
+        localStorage.setItem('theme', 'night');
+        themeToggle.setAttribute('aria-pressed', 'true');
+      }
+    });
+  }
 
   // Nav
   document.querySelectorAll('[data-view]').forEach(link => {
