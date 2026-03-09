@@ -1,6 +1,8 @@
 const CACHE_KEY_REPOS = 'github_repos';
 const CACHE_KEY_EVENTS = 'github_events';
+const CACHE_KEY_BLOG_VERSION = 'blog_manifest_version';
 const CACHE_EXPIRY = 5 * 60 * 1000;
+const BLOG_POLL_INTERVAL = 30 * 1000;
 
 let currentView = 'home';
 let currentPostSlug = null;
@@ -231,6 +233,34 @@ async function loadContributionStats() {
 
 // ─── Blog list ───────────────────────────────────────────────────────────────
 
+async function checkBlogUpdate() {
+  try {
+    const res = await fetch('blog-manifest.json', { cache: 'no-store' });
+    if (!res.ok) return null;
+    const manifest = await res.json();
+    const version = manifest.version || 1;
+    const lastVersion = localStorage.getItem(CACHE_KEY_BLOG_VERSION);
+    if (lastVersion && String(version) !== lastVersion) {
+      localStorage.setItem(CACHE_KEY_BLOG_VERSION, String(version));
+      return manifest;
+    }
+    localStorage.setItem(CACHE_KEY_BLOG_VERSION, String(version));
+  } catch (err) {
+    console.error('Blog version check error:', err);
+  }
+  return null;
+}
+
+function startBlogPolling() {
+  setInterval(async () => {
+    if (currentView !== 'blog' || currentPostSlug) return;
+    const updatedManifest = await checkBlogUpdate();
+    if (updatedManifest) {
+      loadBlogList();
+    }
+  }, BLOG_POLL_INTERVAL);
+}
+
 async function loadBlogList() {
   const container = document.getElementById('blogContainer');
   if (!container) return;
@@ -238,7 +268,10 @@ async function loadBlogList() {
   try {
     const manifestRes = await fetch('blog-manifest.json');
     if (!manifestRes.ok) throw new Error('manifest');
-    const slugs = await manifestRes.json();
+    const manifest = await manifestRes.json();
+    const slugs = Array.isArray(manifest) ? manifest : manifest.posts || [];
+    const version = manifest.version || 1;
+    localStorage.setItem(CACHE_KEY_BLOG_VERSION, String(version));
 
     const postFiles = await Promise.all(
       slugs.map(slug =>
@@ -432,6 +465,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Data
   Promise.all([loadRepositories(), loadContributionStats()]);
+  checkBlogUpdate();
+  startBlogPolling();
 
   // Scroll animations (slight delay so initial render is done)
   requestAnimationFrame(() => initScrollAnimations());
