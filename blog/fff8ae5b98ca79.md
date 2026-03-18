@@ -1,9 +1,8 @@
 ---
 title: "neovimのディストリビューション「NazoVim」を作った話" 
 emoji: "✨"
-type: "tech" # tech: 技術記事 / idea: アイデア
-topics: [neovim, Lazy, dotfiles, config, nix]
-published: true
+date: 2025-03-18
+category: Neovim
 ---
 
 ## なぜ作ろうと思ったのか
