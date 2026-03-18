@@ -1,8 +1,8 @@
 ---
 title: "neovimのディストリビューション「NazoVim」を作った話" 
 emoji: "✨"
-date: 2025-03-18
-category: Neovim
+date: 2025-3-18
+category: neovim
 ---
 
 ## なぜ作ろうと思ったのか
