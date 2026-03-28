@@ -199,8 +199,8 @@ async function loadRepositories() {
 
   } catch (err) {
     container.innerHTML = err.message === 'rate_limit'
-      ? '<p class="error-msg">API rate limit exceeded. Try again later.</p>'
-      : '<p class="error-msg">Failed to load repositories</p>';
+      ? '<p class="error-msg">API制限に達しました。しばらくお待ちください。</p>'
+      : '<p class="error-msg">リポジトリの読み込みに失敗しました</p>';
   }
 }
 
@@ -240,8 +240,8 @@ async function loadContributionStats() {
 
   } catch (err) {
     console.error('Contribution stats load error:', err);
-    totalEl.textContent = err.message === 'rate_limit' ? 'API制限' : '-';
-    todayEl.textContent = err.message === 'rate_limit' ? 'API制限' : '-';
+    totalEl.textContent = err.message === 'rate_limit' ? 'API制限' : 'エラー';
+    todayEl.textContent = err.message === 'rate_limit' ? 'API制限' : 'エラー';
   }
 }
 
@@ -370,7 +370,7 @@ async function loadZennArticles() {
 
   } catch (err) {
     console.error('Zenn load error:', err);
-    container.innerHTML = '<p class="error-msg">Failed to load Zenn articles</p>';
+    container.innerHTML = '<p class="error-msg">Zenn記事の読み込みに失敗しました</p>';
   }
 }
 
