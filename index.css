@@ -429,46 +429,6 @@ body::before {
   margin-left: 0.25rem;
 }
 
-/* ── Skills ── */
-.skills-grid {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-}
-
-.skill-tag {
-  display: inline-flex;
-  align-items: center;
-  padding: 0.35rem 0.875rem;
-  border-radius: 6px;
-  font-family: var(--font-mono);
-  font-size: 0.82rem;
-  transition: all 0.22s ease;
-  letter-spacing: 0.02em;
-}
-
-.skill-tag.primary {
-  background: rgba(196, 178, 138, 0.15);
-  color: var(--yellow);
-  border: 1px solid rgba(196, 178, 138, 0.35);
-}
-
-.skill-tag.secondary {
-  background: var(--glass);
-  color: var(--fg);
-  border: 1px solid var(--glass-border);
-}
-
-.skill-tag:hover {
-  transform: translateY(-2px) scale(1.03);
-  box-shadow: 0 4px 12px var(--shadow);
-}
-
-.skill-tag.primary:hover {
-  background: rgba(196, 178, 138, 0.25);
-  box-shadow: 0 4px 14px rgba(196, 178, 138, 0.15);
-}
-
 /* ── Environment Grid ── */
 .env-grid {
   display: grid;
