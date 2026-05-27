@@ -1,0 +1,36 @@
+<script lang="ts">
+	import { page } from '$app/stores';
+	import ThemeToggle from './ThemeToggle.svelte';
+
+	const navItems = [
+		{ path: '/', label: 'Home' },
+		{ path: '/blog', label: 'Blog' },
+		{ path: '/zenn', label: 'Zenn' },
+	];
+</script>
+
+<header class="top-bar">
+	<div class="top-bar-inner">
+		<div class="profile-mini">
+			<a href="/">
+				<div class="avatar" aria-hidden="true">@</div>
+				<span class="username">nazozokc</span>
+			</a>
+		</div>
+		<nav class="top-bar-links" aria-label="Navigation">
+			{#each navItems as item}
+				<a
+					href={item.path}
+					class="nav-link"
+					class:active={$page.url.pathname === item.path}
+					data-sveltekit-preload-data="hover"
+				>
+					{item.label}
+				</a>
+			{/each}
+			<ThemeToggle />
+			<a href="https://x.com/@NazozoK6519" target="_blank" rel="noopener noreferrer" class="nav-link">X</a>
+			<a href="https://github.com/nazozokc" target="_blank" rel="noopener noreferrer" class="nav-link">GitHub</a>
+		</nav>
+	</div>
+</header>
