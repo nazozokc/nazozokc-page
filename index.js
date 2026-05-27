@@ -2,10 +2,11 @@ const CACHE_KEY_REPOS = 'github_repos';
 const CACHE_KEY_EVENTS = 'github_events';
 const CACHE_KEY_BLOG_VERSION = 'blog_manifest_version';
 const CACHE_EXPIRY = 5 * 60 * 1000;
-const BLOG_POLL_INTERVAL = 30 * 1000;
+const BLOG_POLL_INTERVAL = 180 * 1000;
 
 let currentView = 'home';
 let currentPostSlug = null;
+let blogPollInterval = null;
 
 // ─── Scroll-triggered entrance animations ───────────────────────────────────
 
@@ -94,7 +95,7 @@ function parseFrontmatter(markdown) {
   const match = markdown.match(/^---\n([\s\S]*?)\n---/);
   if (!match) return null;
 
-  const fm = {};
+  const fm = Object.create(null);
   const lines = match[1].split('\n');
   for (const line of lines) {
     const ci = line.indexOf(':');
@@ -115,6 +116,10 @@ function switchView(view) {
   const zennView = document.getElementById('zennView');
   const navLinks = document.querySelectorAll('[data-view]');
 
+  if (currentView === 'blog' && view !== 'blog') {
+    stopBlogPolling();
+  }
+
   currentView = view;
 
   if (view === 'home') {
@@ -128,6 +133,7 @@ function switchView(view) {
     blogView?.style.setProperty('display', 'block');
     zennView?.style.setProperty('display', 'none');
     loadBlogList();
+    startBlogPolling();
     window.scrollTo(0, 0);
   } else if (view === 'zenn') {
     homeView?.style.setProperty('display', 'none');
@@ -214,9 +220,17 @@ async function loadContributionStats() {
   try {
     let events = getCachedData(CACHE_KEY_EVENTS);
     if (!events) {
-      const res = await fetch('https://api.github.com/users/nazozokc/events?per_page=100');
-      if (!res.ok) throw new Error(res.status === 403 || res.status === 429 ? 'rate_limit' : 'network');
-      events = await res.json();
+      const allEvents = [];
+      const baseUrl = 'https://api.github.com/users/nazozokc/events?per_page=100';
+      for (let page = 1; page <= 3; page++) {
+        const url = page === 1 ? baseUrl : `${baseUrl}&page=${page}`;
+        const res = await fetch(url);
+        if (!res.ok) throw new Error(res.status === 403 || res.status === 429 ? 'rate_limit' : 'network');
+        const data = await res.json();
+        if (data.length === 0) break;
+        allEvents.push(...data);
+      }
+      events = allEvents;
       setCachedData(CACHE_KEY_EVENTS, events);
     }
 
@@ -266,13 +280,21 @@ async function checkBlogUpdate() {
 }
 
 function startBlogPolling() {
-  setInterval(async () => {
+  if (blogPollInterval) return;
+  blogPollInterval = setInterval(async () => {
     if (currentView !== 'blog' || currentPostSlug) return;
     const updatedManifest = await checkBlogUpdate();
     if (updatedManifest) {
       loadBlogList();
     }
   }, BLOG_POLL_INTERVAL);
+}
+
+function stopBlogPolling() {
+  if (blogPollInterval) {
+    clearInterval(blogPollInterval);
+    blogPollInterval = null;
+  }
 }
 
 async function loadBlogList() {
@@ -405,7 +427,10 @@ async function loadBlogPost(slug) {
     if (!res.ok) throw new Error('load');
     const markdown = await res.text();
     const fm = parseFrontmatter(markdown);
-    const html = marked.parse(markdown.replace(/^---[\s\S]*?---\n/, ''));
+
+    if (typeof marked === 'undefined') throw new Error('marked_missing');
+    const rawHtml = marked.parse(markdown.replace(/^---[\s\S]*?---\n/, ''));
+    const html = typeof DOMPurify !== 'undefined' ? DOMPurify.sanitize(rawHtml) : rawHtml;
 
     postContainer.innerHTML = `
       <div class="post-card">
@@ -480,7 +505,6 @@ document.addEventListener('DOMContentLoaded', () => {
   // Data
   Promise.all([loadRepositories(), loadContributionStats()]);
   checkBlogUpdate();
-  startBlogPolling();
 
   // Scroll animations (slight delay so initial render is done)
   requestAnimationFrame(() => {
