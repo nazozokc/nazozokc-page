@@ -1,54 +1,54 @@
-## CLAUDE.md 要約
+## プロジェクト概要
 
-### プロジェクトの概要
-nazozokcのポートフォリオサイト。GitHub Pagesでホストされている。
+nazozokcのポートフォリオサイト。SvelteKit 5 + Static Adapter で構築、GitHub Pages でホスト。
 
----
+## 技術スタック
 
-### ファイル構成
+- Svelte 5 (runes: `$state`, `$derived`, `$effect`)
+- SvelteKit 2 + `@sveltejs/adapter-static`
+- TypeScript
+- カスタムCSS (Kanagawa風テーマ、glassmorphism)
+- GitHub REST API (クライアントサイドfetch)
+- Zenn API (クライアントサイドfetch)
+- marked (ビルド時のみ)
 
-| ファイル | 説明 |
+## ファイル構成
+
+| ファイル/ディレクトリ | 説明 |
 |---|---|
-| index.html | メインページ（各ビュー、ヘッダー、フッター） |
-| index.js | 共通JS（GitHub API、blog読み込み、テーマ切り替え） |
-| index.css | 共通スタイル（Kanagawa風テーマ、レスポンシブデザイン） |
-| blog-index.json | ブログ記事のインデックス |
-| blog/*.md | ブログ記事（Markdown） |
-| image/* | 画像リソース（ファビコン、プロフィール画像） |
+| `src/routes/` | SvelteKitルート、ページコンポーネント |
+| `src/lib/components/` | 共通コンポーネント |
+| `src/lib/utils/` | GitHub/Zenn APIクライアント、キャッシュ |
+| `src/lib/data/` | 静的データ (skills, interests, timeline) |
+| `src/lib/theme.ts` | テーマ管理 (day/night) Svelte store |
+| `src/app.css` | グローバルCSS (Kanagawaテーマ) |
+| `static/` | 静的アセット (画像, blog-manifest.json) |
+| `blog/*.md` | ブログ記事 (Markdown) |
+| `image/` | 画像リソース (プロジェクトルートに維持) |
 
----
+## ルーティング
 
-### 技術スタック
-HTML/CSS/Vanilla JS + GitHub REST API + marked.js
+| パス | 内容 |
+|---|---|
+| `/` | ホーム (プロフィール、スキル、GitHub連携) |
+| `/blog` | ブログ一覧 |
+| `/blog/[slug]` | 個別ブログ記事 |
+| `/zenn` | Zenn記事一覧 (クライアントサイドfetch) |
 
----
+## 開発
 
-### 主な問題点
+```bash
+npm run dev      # 開発サーバー
+npm run build    # 本番ビルド (static adapter)
+npm run preview  # ビルド成果物のプレビュー
+```
 
-**パフォーマンス**
-- GitHub APIの呼び出しが直列処理で遅い → `Promise.all()`で並列化すべき
+## ブログ追加方法
 
-**信頼性**
-- GitHub APIトークンなし → レート制限（60req/h）に引っかかりやすい
+1. `blog/*.md` にMarkdownファイルを作成 (frontmatter付き)
+2. `blog-manifest.json` の `posts` 配列にslugを追加
 
----
-
-### Blogの追加方法
-
-1. `blog/*.md` にMarkdownファイルを作成
-2. `blog-index.json` に記事を追加
-
----
-
-### ファビコンの設定方法
-
-1. `image/` に画像ファイルを配置
-2. `index.html` の `<head>` 内にある `<link rel="icon">` の `href` を変更
-3. `index.css` の `.hero-profile-image` スタイルを必要に応じて調整
-
----
-
-### カラースキーム（Kanagawa風）
+## カラースキーム (Kanagawa風)
 
 ```
 背景: #e8e4df / テキスト: #3d3d3d

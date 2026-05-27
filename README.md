@@ -1,48 +1,58 @@
 # nazozokc Portfolio
 
-中学生プログラマのポートフォリオサイト。GitHub Pages でホストされています。
+中学生プログラマのポートフォリオサイト。SvelteKit + GitHub Pages でホスト。
 
 ## 技術スタック
 
-- HTML / CSS / Vanilla JavaScript
+- Svelte 5 (runes: `$state`, `$derived`, `$effect`)
+- SvelteKit 2 + `@sveltejs/adapter-static`
+- TypeScript
+- カスタムCSS (Kanagawa風テーマ、glassmorphism)
 - GitHub REST API
-- marked.js
+- Zenn API
+- marked (ビルド時のみ)
 
-## カラースキーム（Kanagawa 風）
+## カラースキーム (Kanagawa風)
 
 ```
-背景：#e8e4df / テキスト：#3d3d3d
-緑：#5a7a4b / 青：#4a6a7a / 赤：#a85450 / 黄：#8a752a
+背景: #e8e4df / テキスト: #3d3d3d
+緑: #5a7a4b / 青: #4a6a7a / 赤: #a85450 / 黄: #8a752a
 ```
 
 ## 主な機能
 
-- ダークモード対応
+- ダークモード対応 (localStorage永続化)
 - GitHub API によるリポジトリ情報表示
-- ブログ機能
-- Zenn 記事連携
+- ブログ機能 (ビルド時markdown→HTMLプリレンダリング)
+- Zenn 記事連携 (クライアントサイドfetch)
+
+## 開発
+
+```bash
+npm run dev      # 開発サーバー
+npm run build    # 本番ビルド (static adapter → build/)
+npm run preview  # ビルド成果物のプレビュー
+```
 
 ## ブログ記事の追加方法
 
-1. `blog/*.md` に Markdown ファイルを作成
-2. `blog-index.json` に記事を追加
-
-## ファビコンの設定方法
-
-1. `image/` に画像ファイルを配置
-2. `index.html` の `<head>` 内にある `<link rel="icon">` の `href` を変更
-3. `index.css` の `.hero-profile-image` スタイルを必要に応じて調整
+1. `blog/*.md` にMarkdownファイルを作成 (frontmatter付き)
+2. `blog-manifest.json` の `posts` 配列にslugを追加
 
 ## ファイル構成
 
-| ファイル | 説明 |
-| --- | --- |
-| index.html | メインページ（各ビュー、ヘッダー、フッター） |
-| index.js | 共通 JS（GitHub API、blog 読み込み、テーマ切り替え） |
-| index.css | 共通スタイル（Kanagawa 風テーマ、レスポンシブデザイン） |
-| blog-index.json | ブログ記事のインデックス |
-| blog/*.md | ブログ記事（Markdown） |
-| image/* | 画像リソース（ファビコン、プロフィール画像） |
+| ファイル/ディレクトリ | 説明 |
+|---|---|
+| `src/routes/` | SvelteKitルート、ページコンポーネント |
+| `src/lib/components/` | 共通コンポーネント |
+| `src/lib/utils/` | GitHub/Zenn APIクライアント、キャッシュ |
+| `src/lib/data/` | 静的データ (skills, interests, timeline) |
+| `src/lib/theme.ts` | テーマ管理 (day/night) Svelte store |
+| `src/app.css` | グローバルCSS (Kanagawaテーマ) |
+| `static/` | 静的アセット (画像, blog-manifest.json) |
+| `blog/*.md` | ブログ記事 (Markdown) |
+| `image/` | 画像リソース (プロジェクトルートに維持) |
+| `.github/workflows/deploy.yml` | GitHub Actions デプロイ設定 |
 
 ## License
 
